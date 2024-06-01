@@ -2065,6 +2065,25 @@ export declare namespace ReadonlyArray {
     NonEmptyReadonlyArray<NonEmptyReadonlyArray<infer A>> ? NonEmptyArray<A>
     : T extends ReadonlyArray<ReadonlyArray<infer A>> ? Array<A>
     : never
+
+  /**
+   * @since 3.2.8
+   */
+  export type IndexOf<T> = keyof T & number
+
+  /**
+   * @since 3.2.8
+   *
+   * Alias of [`ReadonlyArray.any`](ReadonlyArray.any)
+   */
+  export type Any<T extends ReadonlyArray<any> = ReadonlyArray<any>> = T
+
+  export {
+    /**
+     * @since 3.2.8
+     */
+    Any as any
+  }
 }
 
 /**
@@ -2072,11 +2091,20 @@ export declare namespace ReadonlyArray {
  * @since 2.0.0
  */
 export const map: {
-  <S extends ReadonlyArray<any>, B>(
-    f: (a: ReadonlyArray.Infer<S>, i: number) => B
-  ): (self: S) => ReadonlyArray.With<S, B>
-  <S extends ReadonlyArray<any>, B>(self: S, f: (a: ReadonlyArray.Infer<S>, i: number) => B): ReadonlyArray.With<S, B>
-} = dual(2, <A, B>(self: ReadonlyArray<A>, f: (a: A, i: number) => B): Array<B> => self.map(f))
+  <const S extends ReadonlyArray.Any, B>(
+    f: (x: S[number], ix: ReadonlyArray.IndexOf<S>) => B
+  ): (self: S) => { [ix in keyof S]: B }
+  <const S extends ReadonlyArray.Any, B>(
+    self: S,
+    f: (x: S[number], ix: ReadonlyArray.IndexOf<S>) => B
+  ): { [ix in keyof S]: B }
+} = dual(
+  2,
+  <S extends ReadonlyArray.Any, B>(
+    self: S,
+    f: (x: S[number], ix: ReadonlyArray.IndexOf<S>) => B
+  ): Array<B> => self.map(f)
+)
 
 /**
  * Applies a function to each element in an array and returns a new array containing the concatenated mapped elements.
